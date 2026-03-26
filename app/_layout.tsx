@@ -11,6 +11,10 @@ export default function RootLayout() {
   const router = useRouter();
   const [isMenuActive, setIsMenuActive] = useState<boolean>(false);
 
+  const handleMenuActive = () => {
+    setIsMenuActive(!isMenuActive);
+  };
+
   return (
     <>
       <Stack>
@@ -60,7 +64,7 @@ export default function RootLayout() {
 
       <StatusBar style="auto" />
 
-      {isMenuActive && <ModalDrawer />}
+      {isMenuActive && <ModalDrawer handleMenuActive={handleMenuActive} />}
     </>
   );
 }

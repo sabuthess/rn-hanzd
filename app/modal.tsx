@@ -3,10 +3,10 @@ import { StyleSheet, View } from "react-native";
 import { Text } from "@react-navigation/elements";
 import { Link } from "expo-router";
 
-export default function ModalDrawer() {
+export default function ModalDrawer({ handleMenuActive }) {
   return (
     <View style={styles.container}>
-      <Link href={"/scan"} style={styles.text}>
+      <Link onPress={handleMenuActive} href={"/scan"} style={styles.text}>
         <Text style={styles.text}>Scan local songs</Text>
       </Link>
       <Text style={styles.text}>Vintaka</Text>
