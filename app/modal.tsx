@@ -1,29 +1,40 @@
-import { Link } from 'expo-router';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from "react-native";
 
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { Text } from "@react-navigation/elements";
+import { Link } from "expo-router";
 
-export default function ModalScreen() {
+export default function ModalDrawer() {
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title">This is a modal</ThemedText>
-      <Link href="/" dismissTo style={styles.link}>
-        <ThemedText type="link">Go to home screen</ThemedText>
+    <View style={styles.container}>
+      <Link href={"/scan"} style={styles.text}>
+        <Text style={styles.text}>Scan local songs</Text>
       </Link>
-    </ThemedView>
+      <Text style={styles.text}>Vintaka</Text>
+      <Text style={styles.text}>Help</Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  overlay: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
+    justifyContent: "flex-start", // puedes cambiar a 'center' o 'flex-end'
+    alignItems: "flex-start", // donde quieres que aparezca el modal
+    backgroundColor: "rgba(0,0,0,0.5)", // fondo semi-transparente
   },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
+  container: {
+    position: "absolute",
+    display: "flex",
+    gap: 10,
+    width: 130,
+    height: 120,
+    padding: 20,
+    top: 90, // distancia desde arriba
+    right: 30, // distancia desde la izquierda
+    backgroundColor: "rgba(0, 0, 0, 0.87)",
+    borderRadius: 10,
+  },
+  text: {
+    color: "#fff",
   },
 });
