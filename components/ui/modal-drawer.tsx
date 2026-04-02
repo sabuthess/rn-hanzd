@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start", // puedes cambiar a 'center' o 'flex-end'
     alignItems: "flex-start", // donde quieres que aparezca el modal
-    backgroundColor: "rgba(0,0,0,0.5)", // fondo semi-transparente
+    backgroundColor: "rgb(0, 0, 0)", // fondo semi-transparente
   },
   container: {
     position: "absolute",
@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     padding: 20,
     top: 90, // distancia desde arriba
     right: 30, // distancia desde la izquierda
-    backgroundColor: "rgba(0, 0, 0, 0.87)",
+    backgroundColor: "rgb(0, 0, 0)",
     borderRadius: 10,
   },
   text: {
