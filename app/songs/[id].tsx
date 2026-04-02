@@ -1,9 +1,8 @@
-import { useFetchSongs } from "@/hooks/use-fetch-songs";
-
+import { useSongStore } from "@/zustand/store/useSongStore";
 import Slider from "@react-native-community/slider";
 import { useAudioPlayer } from "expo-audio";
 import { useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -12,91 +11,55 @@ export default function SongDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const image = require("@/assets/images/bg-img-song.jpg");
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [hasEnded, setHasEnded] = useState(false);
 
-  const { songs, handlePrev, handleNext } = useFetchSongs();
+  const {
+    songs,
+    currentIndex,
+    setSongById,
+    handleNext,
+    handlePrev,
+    isPlaying,
+    togglePlay,
+  } = useSongStore();
 
-  const findSong = songs.find((song) => song.id === id);
+  const currentSong = songs[currentIndex];
+  // console.log(currentSong);
+  const player = useAudioPlayer(currentSong?.uri ?? "");
 
-  const player = useAudioPlayer(findSong?.uri);
+  const { setPlayer, setStatus, duration, currentTime } = useSongStore();
 
-  
+  useEffect(() => {
+    if (id) setSongById(id);
+  }, [id]);
 
-  // 🎧 FORMATEAR TIEMPO
-  const formatTime = (seconds: number) => {
-    if (!seconds) return "0:00";
-
-    const minutes = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-
-    return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
-  };
-
-  // ▶ PLAY / PAUSE
-  const handlePlayPause = async () => {
-    if (!player) return;
-
-    try {
-      if (player.playing) {
-        player.pause();
-      } else {
-        player.play();
-      }
-    } catch (e) {
-      console.log("Error reproduciendo:", e);
-    }
-  };
-
-  // ⏱ ACTUALIZAR TIEMPO
   useEffect(() => {
     if (!player) return;
 
-    const interval = setInterval(() => {
-      setCurrentTime(player.currentTime || 0);
-      setDuration(player.duration || 0);
+    setPlayer(player);
+
+    const interval = setInterval(async () => {
+      const status = await player.currentStatus;
+
+      if (status?.isLoaded) {
+        setStatus(status.currentTime ?? 0, status.duration ?? 0);
+      }
     }, 1000);
 
     return () => clearInterval(interval);
   }, [player]);
 
-  // 🔥 AUTO SIGUIENTE CUANDO TERMINA
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
   useEffect(() => {
-    if (!player) return;
-
-    if (
-      player.duration &&
-      player.currentTime >= player.duration - 0.5 &&
-      !hasEnded
-    ) {
-      setHasEnded(true);
-      handleNext(findSong?.id ?? "");
+    if (currentSong?.uri) {
+      player.replace(currentSong.uri);
     }
-
-    // reset cuando cambia canción
-    if (player.currentTime < player.duration - 1) {
-      setHasEnded(false);
-    }
-  }, [currentTime]);
-
-  // 📦 CARGAR CANCIONES
-
-  // ▶ AUTO PLAY
-  useEffect(() => {
-    if (!player || !findSong) return;
-
-    const playAudio = async () => {
-      try {
-        await player.play();
-      } catch (e) {
-        console.log("Error auto play:", e);
-      }
-    };
-
-    playAudio();
-    console.log("auto play");
-  }, [findSong]);
+  }, [currentSong]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -105,10 +68,8 @@ export default function SongDetail() {
           <Image source={image} style={styles.img} />
 
           <View style={styles.song_text}>
-            <Text style={styles.title}>{findSong?.title}</Text>
-            <Text style={styles.artist}>
-              {findSong?.artist || "Unknown artist - Music"}
-            </Text>
+            <Text style={styles.title}>{currentSong?.title}</Text>
+            <Text style={styles.artist}>Unknown artist - Music</Text>
           </View>
         </View>
       </View>
@@ -144,35 +105,15 @@ export default function SongDetail() {
           <Icon name="shuffle" size={25} color="black" />
 
           <View style={styles.container_btn_play}>
-            <Icon
-              name="play-skip-back-sharp"
-              size={45}
-              color="black"
-              onPress={handlePrev}
-            />
+            <Icon name="play-skip-back-sharp" size={45} onPress={handlePrev} />
 
-            {player?.playing ? (
-              <Icon
-                name="pause"
-                size={45}
-                color="black"
-                onPress={handlePlayPause}
-              />
+            {isPlaying ? (
+              <Icon name="pause" size={45} onPress={togglePlay} />
             ) : (
-              <Icon
-                name="play"
-                size={45}
-                color="black"
-                onPress={handlePlayPause}
-              />
+              <Icon name="play" size={45} onPress={togglePlay} />
             )}
 
-            <Icon
-              name="play-skip-forward"
-              size={45}
-              color="black"
-              onPress={() => findSong && handleNext(findSong?.id ?? "")}
-            />
+            <Icon name="play-skip-forward" size={45} onPress={handleNext} />
           </View>
 
           <Icon name="list-outline" size={25} color="#333" />
