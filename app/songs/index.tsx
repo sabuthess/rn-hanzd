@@ -1,10 +1,17 @@
-import { SongItemCard } from "@/components/song-item-card";
+import { SongItemCard } from "@/components/ui/song-item-card";
+import { storage } from "@/utils/mmkv";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
-const DATA = require("@/db/data.json");
+// const DATA = require("@/db/data.json");
 
 export default function SongsScreen() {
+  // const { songs } = useContext(SongContex);
+  // const songs = [{ id: "asdfasdf", title: "All yours" }];
+
+  const songsJson = storage.getString("@local_songs");
+  const songs = JSON.parse(songsJson);
+
   return (
     <>
       <View>
@@ -19,16 +26,23 @@ export default function SongsScreen() {
         </View>
       </View>
 
-      <FlatList
-        style={styles.container_list}
-        showsVerticalScrollIndicator={false}
-        scrollEnabled={true}
-        data={DATA}
-        renderItem={({ item }) => (
-          <SongItemCard id={item.id} title={item.title} artist={item.artist} />
-        )}
-        keyExtractor={(item) => item.id}
-      />
+      {songs && (
+        <FlatList
+          style={styles.container_list}
+          showsVerticalScrollIndicator={false}
+          scrollEnabled={true}
+          data={songs}
+          renderItem={({ item }) => (
+            <SongItemCard
+              id={item.id}
+              title={item.title}
+              // uri={""}
+              // artist={""} // artist={item.artist}
+            />
+          )}
+          keyExtractor={(item) => item.id}
+        />
+      )}
     </>
   );
 }
@@ -39,15 +53,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     gap: 30,
     marginHorizontal: 20,
-  },
-  container_scroll: {
-    marginVertical: 10,
-  },
-
-  container: {
-    flex: 1,
-    marginTop: 50,
-    backgroundColor: "#ffffffc9",
   },
 
   container_info_songs: {
