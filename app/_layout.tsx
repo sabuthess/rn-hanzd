@@ -1,3 +1,5 @@
+import { GlobalPlayer } from "@/components/global-player";
+import ModalDrawer from "@/components/ui/modal-drawer";
 import { Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
@@ -5,7 +7,6 @@ import { Pressable, TouchableOpacity, View } from "react-native";
 import "react-native-reanimated";
 
 import Icon from "react-native-vector-icons/Ionicons";
-import ModalDrawer from "./modal";
 
 export default function RootLayout() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function RootLayout() {
         <Stack.Screen
           name="index"
           options={{
-            headerStyle: { backgroundColor: "#fafafa" },
+            headerStyle: { backgroundColor: "#eee" },
             headerShadowVisible: false,
             headerTitle: "All songs",
             headerRight: () => (
@@ -59,12 +60,20 @@ export default function RootLayout() {
             ),
           }}
         />
-        <Stack.Screen name="scan" />
+        <Stack.Screen
+          name="scan/index"
+          options={{ headerTitle: "Scan local songs" }}
+        />
+        <Stack.Screen
+          name="playlists/index"
+          options={{ headerTitle: "Scan local songs" }}
+        />
       </Stack>
 
       <StatusBar style="auto" />
 
       {isMenuActive && <ModalDrawer handleMenuActive={handleMenuActive} />}
+      <GlobalPlayer />
     </>
   );
 }
