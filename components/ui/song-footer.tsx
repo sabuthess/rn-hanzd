@@ -7,12 +7,10 @@ import Icon from "react-native-vector-icons/Ionicons";
 export const SongFooter = () => {
   const image = require("@/assets/images/bg-img-song.jpg");
 
-  const { songs, currentIndex, isPlaying, togglePlay, handleNext } =
+  const { queue, currentIndex, handleNext, isPlaying, togglePlay } =
     useSongStore();
 
-  const currentSong = songs[currentIndex];
-
-  if (!currentSong) return null;
+  const currentSong = queue[currentIndex];
 
   return (
     <View style={styles.container_song_modal}>
@@ -28,7 +26,7 @@ export const SongFooter = () => {
 
           <View>
             <Text numberOfLines={1} ellipsizeMode="tail" style={{ width: 150 }}>
-              {currentSong.title}
+              {currentSong?.title}
             </Text>
             <Text>Unknown Artist</Text>
           </View>
@@ -97,28 +95,34 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
     // alignItems: "center",
-    width: "100%",
+    width: "90%",
+    marginHorizontal: "auto",
     // padding: 10,
-    marginHorizontal: 0,
-    borderRadius: 25,
-    backgroundColor: "#38cf90",
+    marginBottom: 20,
+    borderRadius: 5,
+    // backgroundColor: "#aab9b3",
+    backgroundColor: "#8dc2ad",
   },
 
   container_song_modal_info: {
     display: "flex",
     flexDirection: "row",
-    gap: 20,
+    gap: 10,
     // backgroundColor: "blue",
-    paddingHorizontal: 20,
+    // paddingHorizontal: 10,
     paddingVertical: 10,
   },
 
-  container_song_modal_img_info: { width: 35, height: 35, borderRadius: 5 },
+  container_song_modal_img_info: {
+    width: 40,
+    height: 40,
+    borderRadius: 5,
+  },
 
   container_songs_modal_btns_controllers: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-end",
-    gap: 15,
+    gap: 10,
   },
 });
