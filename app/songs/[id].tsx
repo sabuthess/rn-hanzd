@@ -1,6 +1,7 @@
+import { formatTime } from "@/utils/format-song";
 import { useSongStore } from "@/zustand/store/useSongStore";
 import Slider from "@react-native-community/slider";
-import { useAudioPlayer } from "expo-audio";
+import { setAudioModeAsync } from "expo-audio";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
@@ -13,53 +14,31 @@ export default function SongDetail() {
   const image = require("@/assets/images/bg-img-song.jpg");
 
   const {
-    songs,
+    queue,
     currentIndex,
     setSongById,
     handleNext,
     handlePrev,
     isPlaying,
     togglePlay,
+    player,
+    duration,
+    currentTime,
   } = useSongStore();
 
-  const currentSong = songs[currentIndex];
-  // console.log(currentSong);
-  const player = useAudioPlayer(currentSong?.uri ?? "");
-
-  const { setPlayer, setStatus, duration, currentTime } = useSongStore();
+  const currentSong = queue[currentIndex];
 
   useEffect(() => {
     if (id) setSongById(id);
   }, [id]);
 
   useEffect(() => {
-    if (!player) return;
-
-    setPlayer(player);
-
-    const interval = setInterval(async () => {
-      const status = await player.currentStatus;
-
-      if (status?.isLoaded) {
-        setStatus(status.currentTime ?? 0, status.duration ?? 0);
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [player]);
-
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-  };
-
-  useEffect(() => {
-    if (currentSong?.uri) {
-      player.replace(currentSong.uri);
-    }
-  }, [currentSong]);
+    setAudioModeAsync({
+      playsInSilentMode: true,
+      shouldPlayInBackground: true,
+      interruptionMode: "doNotMix",
+    });
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -68,13 +47,18 @@ export default function SongDetail() {
           <Image source={image} style={styles.img} />
 
           <View style={styles.song_text}>
-            <Text style={styles.title}>{currentSong?.title}</Text>
-            <Text style={styles.artist}>Unknown artist - Music</Text>
+            <Text numberOfLines={2} ellipsizeMode="clip" style={styles.title}>
+              {currentSong?.title}
+            </Text>
+            <Text style={styles.artist}>
+              {currentSong?.artist ?? "Unknown artist"}
+            </Text>
           </View>
         </View>
       </View>
 
       <View style={styles.section}>
+        {/* No se que poner aqui */}
         <View style={styles.container_btns_info}>
           <Icon name="heart-outline" size={25} color="#333" />
           <Icon name="moon" size={25} color="black" />
@@ -83,15 +67,16 @@ export default function SongDetail() {
         </View>
 
         {/* 🎚 SLIDER */}
-        <View>
+        <View style={{ width: "100%" }}>
           <Slider
-            style={{ width: "auto", height: 40 }}
+            style={{ width: "100%", height: 40 }}
             minimumValue={0}
             maximumValue={duration || 1}
             value={currentTime}
             onSlidingComplete={(value) => {
               player?.seekTo(value);
             }}
+            // onValueChange={setSongDuration}
           />
 
           <View style={styles.container_info_slider}>
@@ -100,12 +85,12 @@ export default function SongDetail() {
           </View>
         </View>
 
-        {/* 🎮 CONTROLES */}
+        {/* CONTROLES */}
         <View style={styles.container_btns_contoler_music}>
           <Icon name="shuffle" size={25} color="black" />
 
           <View style={styles.container_btn_play}>
-            <Icon name="play-skip-back-sharp" size={45} onPress={handlePrev} />
+            <Icon name="play-skip-back" size={45} onPress={handlePrev} />
 
             {isPlaying ? (
               <Icon name="pause" size={45} onPress={togglePlay} />
