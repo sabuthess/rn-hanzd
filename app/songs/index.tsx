@@ -1,16 +1,13 @@
 import { SongItemCard } from "@/components/ui/song-item-card";
-import { storage } from "@/utils/mmkv";
+import { useSongStore } from "@/zustand/store/useSongStore";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
 // const DATA = require("@/db/data.json");
 
 export default function SongsScreen() {
-  // const { songs } = useContext(SongContex);
-  // const songs = [{ id: "asdfasdf", title: "All yours" }];
-
-  const songsJson = storage.getString("@local_songs");
-  const songs = JSON.parse(songsJson);
+  const { songs } = useSongStore();
 
   return (
     <>
@@ -20,8 +17,13 @@ export default function SongsScreen() {
             <Text>Play all (242) </Text>
           </View>
           <View style={styles.container_info_btns}>
-            <Icon name="list-outline" size={24} color="#333" />
-            <Icon name="swap-vertical" size={24} color="#333" />
+            <AntDesign
+              name="swap"
+              size={24}
+              color="black"
+              style={{ transform: [{ rotate: "90deg" }] }}
+            />
+            <Icon name="list-outline" size={24} color="#555" />
           </View>
         </View>
       </View>
@@ -33,12 +35,7 @@ export default function SongsScreen() {
           scrollEnabled={true}
           data={songs}
           renderItem={({ item }) => (
-            <SongItemCard
-              id={item.id}
-              title={item.title}
-              // uri={""}
-              // artist={""} // artist={item.artist}
-            />
+            <SongItemCard id={item.id} title={item.title} />
           )}
           keyExtractor={(item) => item.id}
         />
