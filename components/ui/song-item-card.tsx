@@ -1,5 +1,6 @@
 import { Link } from "expo-router";
 
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
@@ -23,8 +24,9 @@ export const SongItemCard = ({ id, title }: { id: string; title: string }) => {
         </Pressable>
       </Link>
       <View style={styles.container_icons}>
-        <Icon name="add-circle-outline" size={24} color="#333" />
-        <Icon name="ellipsis-vertical" size={24} color="#333" />
+        {/* <Icon name="add-circle-outline" size={24} color="#333" /> */}
+        <MaterialIcons name="playlist-add" size={24} color="#555" />
+        <Icon name="ellipsis-vertical" size={24} color="#555" />
       </View>
     </View>
   );
