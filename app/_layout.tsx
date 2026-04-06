@@ -1,8 +1,9 @@
 import { GlobalPlayer } from "@/components/global-player";
 import ModalDrawer from "@/components/ui/modal-drawer";
+import { setAudioModeAsync } from "expo-audio";
 import { Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, TouchableOpacity, View } from "react-native";
 import "react-native-reanimated";
 
@@ -16,13 +17,32 @@ export default function RootLayout() {
     setIsMenuActive(!isMenuActive);
   };
 
+  useEffect(() => {
+    const init = async () => {
+      try {
+        await setAudioModeAsync({
+          playsInSilentModeIOS: true,
+          staysActiveInBackground: true,
+          interruptionModeAndroid: "doNotMix",
+          interruptionModeIOS: "doNotMix",
+          shouldDuckAndroid: false,
+        });
+
+        console.log("✅ audio listo");
+      } catch (e) {
+        console.log("❌ audio error", e);
+      }
+    };
+
+    init();
+  }, []);
   return (
     <>
       <Stack>
         <Stack.Screen
           name="index"
           options={{
-            headerStyle: { backgroundColor: "#eee" },
+            // headerStyle: { backgroundColor: "#eee" },
             headerShadowVisible: false,
             headerTitle: "All songs",
             headerRight: () => (
@@ -34,7 +54,10 @@ export default function RootLayout() {
                   gap: 30,
                 }}
               >
-                <Icon name="search-outline" size={24} color="#333" />
+                <Pressable onPress={() => router.push("/search")}>
+                  <Icon name="search-outline" size={24} color="#333" />
+                </Pressable>
+
                 <Pressable onPress={() => setIsMenuActive(!isMenuActive)}>
                   <Icon name="ellipsis-vertical" size={24} color="#333" />
                 </Pressable>
@@ -62,16 +85,27 @@ export default function RootLayout() {
         />
         <Stack.Screen
           name="scan/index"
-          options={{ headerTitle: "Scan local songs" }}
+          options={{
+            headerTitle: "Scan local songs",
+
+            headerShadowVisible: false,
+          }}
         />
+
         <Stack.Screen
-          name="playlists/index"
+          name="search/index"
+          options={{
+            headerShown: false,
+            headerShadowVisible: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="playlists"
           options={{ headerTitle: "Scan local songs" }}
         />
       </Stack>
-
       <StatusBar style="auto" />
-
       {isMenuActive && <ModalDrawer handleMenuActive={handleMenuActive} />}
       <GlobalPlayer />
     </>
