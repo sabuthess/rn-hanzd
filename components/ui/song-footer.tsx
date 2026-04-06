@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     marginHorizontal: "auto",
     // padding: 10,
     marginBottom: 20,
-    borderRadius: 5,
+    borderRadius: 25,
     // backgroundColor: "#aab9b3",
     backgroundColor: "#8dc2ad",
   },
