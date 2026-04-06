@@ -3,8 +3,12 @@ import { ISong } from "./song.interface";
 
 export interface ISongStore {
   songs: ISong[];
+
+  queue: ISong[];
   currentIndex: number;
+
   player: AudioPlayer | null;
+  subscription: any | null; // listener activo
 
   duration: number;
   currentTime: number;
@@ -12,11 +16,17 @@ export interface ISongStore {
   isPlaying: boolean;
 
   setSongs: (songs: ISong[]) => void;
+
+  setQueue: (songs: ISong[], startIndex?: number) => Promise<void>;
+  playCurrent: () => Promise<void>;
   setSongById: (id: string) => Promise<void>;
-  handleNext: () => Promise<void>;
-  handlePrev: () => Promise<void>;
+
   togglePlay: () => Promise<void>;
 
-  setPlayer: (player: AudioPlayer) => void;
-  setStatus: (time: number, duration: number) => void;
+  handleNext: () => Promise<void>;
+  handlePrev: () => Promise<void>;
+
+  addToQueue: (song: ISong) => void;
+  removeFromQueue: (index: number) => void;
+  replaceQueue: (songs: ISong[]) => void;
 }
