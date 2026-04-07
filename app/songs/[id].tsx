@@ -1,7 +1,6 @@
 import { formatTime } from "@/utils/format-song";
 import { useSongStore } from "@/zustand/store/useSongStore";
 import Slider from "@react-native-community/slider";
-import { setAudioModeAsync } from "expo-audio";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
@@ -31,14 +30,6 @@ export default function SongDetail() {
   useEffect(() => {
     if (id) setSongById(id);
   }, [id]);
-
-  useEffect(() => {
-    setAudioModeAsync({
-      playsInSilentMode: true,
-      shouldPlayInBackground: true,
-      interruptionMode: "doNotMix",
-    });
-  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -71,12 +62,13 @@ export default function SongDetail() {
           <Slider
             style={{ width: "100%", height: 40 }}
             minimumValue={0}
-            maximumValue={duration || 1}
-            value={currentTime}
-            onSlidingComplete={(value) => {
-              player?.seekTo(value);
-            }}
-            // onValueChange={setSongDuration}
+            maximumValue={duration / 1000} // duración en segundos
+            value={currentTime / 1000} // tiempo actual
+            minimumTrackTintColor="#12b63b"
+            maximumTrackTintColor="#000000"
+            thumbTintColor="#333333"
+            // onValueChange={setValue}
+            onSlidingComplete={(val) => player?.seekTo(val * 1000)}
           />
 
           <View style={styles.container_info_slider}>
