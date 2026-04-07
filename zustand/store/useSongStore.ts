@@ -4,16 +4,6 @@ import { storage } from "@/utils/mmkv";
 import type { AudioPlayer } from "expo-audio";
 import { createAudioPlayer } from "expo-audio";
 import { create } from "zustand";
-//
-/* =========================|
-   🎵 TYPES
-========================= */
-
-interface PlaybackStatus {
-  currentTime?: number;
-  duration?: number;
-  didJustFinish?: boolean;
-}
 
 /* =========================
    💾 STORAGE
@@ -24,9 +14,17 @@ const parsedSongs: ISong[] = storedSongs ? JSON.parse(storedSongs) : [];
 /* =========================
    🔐 HELPERS
 ========================= */
-const safeRelease = async (player?: AudioPlayer | null, subscription?: any) => {
+const safeRelease = async (
+  player?: AudioPlayer | null,
+  subscription?: any,
+  interval?: any,
+) => {
   try {
-    subscription?.remove?.(); // elimina listener viejo
+    subscription?.remove?.();
+
+    if (interval) {
+      clearInterval(interval);
+    }
 
     if (!player) return;
 
@@ -40,28 +38,22 @@ const setupLockScreen = (player: AudioPlayer, song: ISong) => {
     player.setActiveForLockScreen(true, {
       title: song.title ?? "Unknown",
       artist: song.artist ?? "Unknown",
-      albumTitle: song.album ?? "",
-      artworkUrl: song.artwork ?? undefined,
+      artworkUrl: "./assets/images/bg-img-song.jpg",
     });
   } catch (e) {
     console.log("⚠️ lockscreen error", e);
   }
 };
 
-const createNewPlayer = async (
-  song: ISong,
-  onUpdate: (status: PlaybackStatus) => void,
-) => {
+const createNewPlayer = async (song: ISong) => {
   const player = await createAudioPlayer({
     source: { uri: song.uri },
     updateInterval: 250,
   });
 
-  const subscription = player.addListener("playbackStatusUpdate", onUpdate);
-
   setupLockScreen(player, song);
 
-  return { player, subscription };
+  return { player };
 };
 
 /* =========================
@@ -75,11 +67,14 @@ export const useSongStore = create<ISongStore>((set, get) => ({
 
   player: null,
   subscription: null,
+  trackingInterval: null,
 
   duration: 0,
   currentTime: 0,
 
   isPlaying: false,
+
+  currentPlayId: null as number | null,
 
   /* =========================
      🎶 SET SONGS
@@ -90,13 +85,15 @@ export const useSongStore = create<ISongStore>((set, get) => ({
      🎶 SET QUEUE
   ========================= */
   setQueue: async (songs, startIndex = 0) => {
-    const { player, subscription } = get();
-    await safeRelease(player, subscription);
+    const { player, subscription, trackingInterval } = get();
+
+    await safeRelease(player, subscription, trackingInterval);
 
     set({
       queue: songs,
       currentIndex: startIndex,
       subscription: null,
+      trackingInterval: null,
     });
 
     await get().playCurrent();
@@ -106,40 +103,58 @@ export const useSongStore = create<ISongStore>((set, get) => ({
      ▶️ PLAY CURRENT
   ========================= */
   playCurrent: async () => {
-    const { queue, currentIndex, player: oldPlayer, subscription } = get();
+    const {
+      queue,
+      currentIndex,
+      player: oldPlayer,
+      subscription,
+      trackingInterval,
+    } = get();
     if (!queue.length) return;
 
-    await safeRelease(oldPlayer, subscription);
+    // Limpia el player anterior
+    await safeRelease(oldPlayer, subscription, trackingInterval);
 
     const song = queue[currentIndex];
 
-    const { player: newPlayer, subscription: newSub } = await createNewPlayer(
-      song,
-      (status) => {
-        const current = get().player;
-        if (current !== newPlayer) return;
+    let newPlayer;
+    try {
+      const result = await createNewPlayer(song);
+      newPlayer = result.player;
+      if (!newPlayer) throw new Error("Player no se pudo crear");
+    } catch (e) {
+      console.error("Error creando AudioPlayer:", e);
+      return;
+    }
 
-        set({
-          currentTime: status.currentTime ?? 0,
-          duration: status.duration ?? 0,
-        });
+    // Suscríbete al evento de progreso
+    const newSub = newPlayer.addListener("playbackStatusUpdate", (status) => {
+      // Este log solo aparecerá si la canción se carga correctamente
+      console.log("Listener disparado!", status);
 
-        // 🔥 autoplay seguro
-        if (status.didJustFinish && get().player === newPlayer) {
-          get().handleNext();
-        }
-      },
-    );
+      set({
+        currentTime: status.currentTime ?? 0,
+        duration: status.duration ?? 0,
+      });
+    });
 
+    // Actualiza el store con el player y subscription
     set({
       player: newPlayer,
       subscription: newSub,
-      isPlaying: true,
+      isPlaying: false,
+      currentTime: 0,
+      duration: 0,
     });
 
-    await newPlayer.play();
+    try {
+      await newPlayer.play();
+      set({ isPlaying: true });
+    } catch (e) {
+      console.error("Error reproduciendo canción:", e);
+      set({ isPlaying: false });
+    }
   },
-
   /* =========================
      ▶️ PLAY BY ID
   ========================= */
@@ -162,14 +177,10 @@ export const useSongStore = create<ISongStore>((set, get) => ({
 
     if (isPlaying) {
       await player.pause();
-      if (get().player === player) {
-        set({ isPlaying: false });
-      }
+      set({ isPlaying: false });
     } else {
       await player.play();
-      if (get().player === player) {
-        set({ isPlaying: true });
-      }
+      set({ isPlaying: true });
     }
   },
 
