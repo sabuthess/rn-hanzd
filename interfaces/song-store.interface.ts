@@ -8,7 +8,10 @@ export interface ISongStore {
   currentIndex: number;
 
   player: AudioPlayer | null;
-  subscription: any | null; // listener activo
+  subscription: any | null;
+
+  trackingInterval: NodeJS.Timeout | null;
+  currentPlayId: number | null;
 
   duration: number;
   currentTime: number;
