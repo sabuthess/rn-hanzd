@@ -1,9 +1,8 @@
 import { GlobalPlayer } from "@/components/global-player";
 import ModalDrawer from "@/components/ui/modal-drawer";
-import { setAudioModeAsync } from "expo-audio";
 import { Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Pressable, TouchableOpacity, View } from "react-native";
 import "react-native-reanimated";
 
@@ -17,25 +16,6 @@ export default function RootLayout() {
     setIsMenuActive(!isMenuActive);
   };
 
-  useEffect(() => {
-    const init = async () => {
-      try {
-        await setAudioModeAsync({
-          playsInSilentModeIOS: true,
-          staysActiveInBackground: true,
-          interruptionModeAndroid: "doNotMix",
-          interruptionModeIOS: "doNotMix",
-          shouldDuckAndroid: false,
-        });
-
-        console.log("✅ audio listo");
-      } catch (e) {
-        console.log("❌ audio error", e);
-      }
-    };
-
-    init();
-  }, []);
   return (
     <>
       <Stack>
