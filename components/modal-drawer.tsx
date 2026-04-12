@@ -9,8 +9,15 @@ export default function ModalDrawer({ handleMenuActive }) {
       <Link onPress={handleMenuActive} href={"/scan"} style={styles.text}>
         <Text style={styles.text}>Scan local songs</Text>
       </Link>
-      <Text style={styles.text}>Vintaka</Text>
-      <Text style={styles.text}>Help</Text>
+      <Link onPress={handleMenuActive} href={"/upload"} style={styles.text}>
+        <Text style={styles.text}>Upload songs</Text>
+      </Link>
+      <Link onPress={handleMenuActive} href={"/download"} style={styles.text}>
+        <Text style={styles.text}>Download songs</Text>
+      </Link>
+      <Link onPress={handleMenuActive} href={"/login"} style={styles.text}>
+        <Text style={styles.text}>Login</Text>
+      </Link>
     </View>
   );
 }
@@ -27,7 +34,6 @@ const styles = StyleSheet.create({
     display: "flex",
     gap: 10,
     width: 130,
-    height: 120,
     padding: 20,
     top: 90, // distancia desde arriba
     right: 30, // distancia desde la izquierda

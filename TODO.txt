@@ -1,0 +1,29 @@
+- arreglar el auto play ✅
+- arreglar en el foreground:
+    - controllers
+    - image
+    - color
+- search screen ✅
+- filter songs on search screen ✅
+- add auto next in queue ✅
+- add buttons secondary controllers: ✅
+    - add to favorites ✅
+    - sleep btn ✅
+    - add ringtone ✅
+    - more options ✅
+- shuffle ✅
+- reped queue
+- Auth: 
+    - providers:
+        -google
+        -facebook
+    - upload songs to storage 
+    - save the (file_name, file_path) from storage in database
+    - download songs in mobile from the database or storage
+
+
+Add all to the global state 
+
+
+RENDIMIENTO: 
+- CARGA RAPIDA DE CANCIONES

@@ -1,10 +1,10 @@
-import { SongItemSearchCard } from "@/components/ui/song-item-search-card";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, StyleSheet, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 // const DATA = require("@/db/data.json");
+import { SongItemCard } from "@/components/song-item-card";
 import { ISong } from "@/interfaces/song.interface";
 import { useSongStore } from "@/zustand/store/useSongStore";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
@@ -46,7 +46,7 @@ export default function SearchScreen() {
           scrollEnabled={true}
           data={songsFiltered}
           renderItem={({ item }) => (
-            <SongItemSearchCard id={item.id} title={item.title} />
+            <SongItemCard id={item.id} title={item.title} />
           )}
           keyExtractor={(item) => item.id}
         />
@@ -57,27 +57,34 @@ export default function SearchScreen() {
 
 const styles = StyleSheet.create({
   container_header: {
-    display: "flex",
-    flexDirection: "row",
-    gap: 30,
-    margin: 20,
-    // flex: 1,
-    width: "100%",
-    alignItems: "center",
+    flexDirection: "row", // Ya es flex por defecto
+    justifyContent: "center", // Centra los elementos horizontalmente
+    alignItems: "center", // Centra los elementos verticalmente
+    marginVertical: 20,
+    marginHorizontal: 30,
+    gap: 10, // No funciona en RN, usamos margenes individuales abajo
   },
+
+  header_item: {
+    marginHorizontal: 10, // Esto reemplaza el 'gap' entre elementos
+  },
+
   container_input: {
-    display: "flex",
-    alignItems: "center",
-    paddingHorizontal: 10,
     flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 15,
     borderRadius: 25,
-    // paddingHorizontal: 10,
-    width: "70%",
     backgroundColor: "#eee",
+    width: "100%",
+    alignSelf: "center",
+  },
+
+  input_text: {
+    flex: 1,
+    paddingVertical: 0,
   },
 
   input: {
-    // backgroundColor: "#000",
     width: "100%",
     borderRadius: 25,
   },
@@ -87,7 +94,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     gap: 30,
     marginHorizontal: 20,
-    // marginVertical: 10,
   },
 
   container_info_songs: {

@@ -1,16 +1,16 @@
-import { formatTime } from "@/utils/format-song";
 import { useSongStore } from "@/zustand/store/useSongStore";
-import Slider from "@react-native-community/slider";
 import { useLocalSearchParams } from "expo-router";
-import React, { useEffect } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
+
+import { formatText } from "@/utils/format-song";
+import React, { useEffect } from "react";
+import { Image, StyleSheet, Text, View } from "react-native";
 
 export default function SongDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const image = require("@/assets/images/bg-img-song.jpg");
+  const image = require("@/assets/images/child-background-img.jpg");
 
   const {
     queue,
@@ -20,9 +20,6 @@ export default function SongDetail() {
     handlePrev,
     isPlaying,
     togglePlay,
-    player,
-    duration,
-    currentTime,
   } = useSongStore();
 
   const currentSong = queue[currentIndex];
@@ -33,67 +30,32 @@ export default function SongDetail() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.section}>
-        <View style={styles.container_info_song}>
-          <Image source={image} style={styles.img} />
+      <View style={styles.container_info_song}>
+        <Image source={image} style={styles.img} />
 
-          <View style={styles.song_text}>
-            <Text numberOfLines={2} ellipsizeMode="clip" style={styles.title}>
-              {currentSong?.title}
-            </Text>
-            <Text style={styles.artist}>
-              {currentSong?.artist ?? "Unknown artist"}
-            </Text>
-          </View>
+        <View>
+          <Text numberOfLines={3} ellipsizeMode="clip" style={styles.title}>
+            {formatText(currentSong?.title)}
+          </Text>
+          <Text style={styles.artist}>Unknown artist</Text>
         </View>
       </View>
 
-      <View style={styles.section}>
-        {/* No se que poner aqui */}
-        <View style={styles.container_btns_info}>
-          <Icon name="heart-outline" size={25} color="#333" />
-          <Icon name="moon" size={25} color="black" />
-          <Icon name="notifications" size={25} color="black" />
-          <Icon name="ellipsis-vertical" size={25} color="#333" />
+      <View style={styles.container_btn_play}>
+        <View style={styles.btn_wrapper}>
+          <Icon name="play-skip-back" size={45} onPress={handlePrev} />
         </View>
 
-        {/* 🎚 SLIDER */}
-        <View style={{ width: "100%" }}>
-          <Slider
-            style={{ width: "100%", height: 40 }}
-            minimumValue={0}
-            maximumValue={duration / 1000} // duración en segundos
-            value={currentTime / 1000} // tiempo actual
-            minimumTrackTintColor="#12b63b"
-            maximumTrackTintColor="#000000"
-            thumbTintColor="#333333"
-            // onValueChange={setValue}
-            onSlidingComplete={(val) => player?.seekTo(val * 1000)}
-          />
-
-          <View style={styles.container_info_slider}>
-            <Text>{formatTime(currentTime)}</Text>
-            <Text>{formatTime(duration)}</Text>
-          </View>
+        <View style={styles.btn_wrapper}>
+          {isPlaying ? (
+            <Icon name="pause" size={45} onPress={togglePlay} />
+          ) : (
+            <Icon name="play" size={45} onPress={togglePlay} />
+          )}
         </View>
 
-        {/* CONTROLES */}
-        <View style={styles.container_btns_contoler_music}>
-          <Icon name="shuffle" size={25} color="black" />
-
-          <View style={styles.container_btn_play}>
-            <Icon name="play-skip-back" size={45} onPress={handlePrev} />
-
-            {isPlaying ? (
-              <Icon name="pause" size={45} onPress={togglePlay} />
-            ) : (
-              <Icon name="play" size={45} onPress={togglePlay} />
-            )}
-
-            <Icon name="play-skip-forward" size={45} onPress={handleNext} />
-          </View>
-
-          <Icon name="list-outline" size={25} color="#333" />
+        <View style={styles.btn_wrapper}>
+          <Icon name="play-skip-forward" size={45} onPress={handleNext} />
         </View>
       </View>
     </SafeAreaView>
@@ -105,25 +67,20 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     paddingHorizontal: 20,
-    paddingTop: 10,
-  },
-  section: {
-    flex: 1,
-    justifyContent: "center",
     alignItems: "center",
+    justifyContent: "space-between",
   },
   container_info_song: {
     width: "100%",
     alignItems: "center",
     gap: 15,
   },
-  song_text: {
-    alignItems: "center",
-  },
+
   img: {
     width: "100%",
     maxWidth: 450,
     height: 300,
+    marginHorizontal: 90,
     borderRadius: 25,
   },
   title: {
@@ -134,18 +91,9 @@ const styles = StyleSheet.create({
   artist: {
     fontSize: 16,
     color: "#7a7a7a",
+    textAlign: "center",
   },
-  container_btns_info: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 25,
-  },
-  container_info_slider: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-  },
+
   container_btns_contoler_music: {
     width: "100%",
     flexDirection: "row",
@@ -157,5 +105,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 15,
+  },
+
+  btn_wrapper: {
+    width: 70, // ancho fijo
+    height: 70, // alto fijo
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

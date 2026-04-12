@@ -4,5 +4,6 @@ export interface ISong {
   title?: string;
   artist?: string;
   album?: string;
+  duration?: number;
   artwork?: string;
 }

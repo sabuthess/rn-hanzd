@@ -1,12 +1,12 @@
 import { GlobalPlayer } from "@/components/global-player";
-import ModalDrawer from "@/components/ui/modal-drawer";
+import { setAudioModeAsync } from "expo-audio";
 import { Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, TouchableOpacity, View } from "react-native";
 import "react-native-reanimated";
-
 import Icon from "react-native-vector-icons/Ionicons";
+import ModalDrawer from "../components/modal-drawer";
 
 export default function RootLayout() {
   const router = useRouter();
@@ -15,6 +15,19 @@ export default function RootLayout() {
   const handleMenuActive = () => {
     setIsMenuActive(!isMenuActive);
   };
+  useEffect(() => {
+    const setupAudio = async () => {
+      await setAudioModeAsync({
+        // staysActiveInBackground: true,
+        shouldPlayInBackground: true,
+        interruptionMode: "mixWithOthers",
+
+        playsInSilentMode: true,
+      });
+    };
+
+    setupAudio();
+  }, []);
 
   return (
     <>
@@ -22,7 +35,6 @@ export default function RootLayout() {
         <Stack.Screen
           name="index"
           options={{
-            // headerStyle: { backgroundColor: "#eee" },
             headerShadowVisible: false,
             headerTitle: "All songs",
             headerRight: () => (
@@ -64,16 +76,32 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
-          name="scan/index"
+          name="scan"
           options={{
             headerTitle: "Scan local songs",
 
             headerShadowVisible: false,
           }}
         />
+        <Stack.Screen
+          name="upload"
+          options={{
+            headerTitle: "Upload local songs",
+
+            headerShadowVisible: false,
+          }}
+        />
+        <Stack.Screen
+          name="download"
+          options={{
+            headerTitle: "Download songs",
+
+            headerShadowVisible: false,
+          }}
+        />
 
         <Stack.Screen
-          name="search/index"
+          name="search"
           options={{
             headerShown: false,
             headerShadowVisible: false,
@@ -81,8 +109,10 @@ export default function RootLayout() {
         />
 
         <Stack.Screen
-          name="playlists"
-          options={{ headerTitle: "Scan local songs" }}
+          name="auth"
+          options={{
+            headerShown: false,
+          }}
         />
       </Stack>
       <StatusBar style="auto" />

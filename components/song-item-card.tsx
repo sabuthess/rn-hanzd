@@ -1,13 +1,14 @@
+import { formatText } from "@/utils/format-song";
 import { Link } from "expo-router";
 
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-export const SongItemSearchCard = ({
+export const SongItemCard = ({
   id,
   title,
 }: {
   id: string;
-  title: string;
+  title: string | undefined;
 }) => {
   return (
     <View style={styles.item}>
@@ -21,7 +22,7 @@ export const SongItemSearchCard = ({
         <Pressable style={{ flex: 1 }}>
           <View style={styles.container_info}>
             <Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>
-              {title}
+              {formatText(title)}
             </Text>
             <Text style={styles.artist}>Unknown artist - Music</Text>
           </View>

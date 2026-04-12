@@ -1,10 +1,18 @@
 import { ISongStore } from "@/interfaces/song-store.interface";
 import { ISong } from "@/interfaces/song.interface";
 import { storage } from "@/utils/mmkv";
+import { Asset } from "expo-asset";
 import type { AudioPlayer } from "expo-audio";
 import { createAudioPlayer } from "expo-audio";
 import { create } from "zustand";
 
+const loadAsset = async () => {
+  const asset = Asset.fromModule(
+    require("../../assets/images/child-background-img.jpg"),
+  );
+  await asset.downloadAsync();
+  return asset.uri;
+};
 /* =========================
    💾 STORAGE
 ========================= */
@@ -32,16 +40,18 @@ const safeRelease = async (
     player.release();
   } catch {}
 };
-
-const setupLockScreen = (player: AudioPlayer, song: ISong) => {
+const setupLockScreen = async (player: AudioPlayer, song: ISong) => {
   try {
+    const uri = await loadAsset();
+
     player.setActiveForLockScreen(true, {
       title: song.title ?? "Unknown",
       artist: song.artist ?? "Unknown",
-      artworkUrl: "./assets/images/bg-img-song.jpg",
+      albumTitle: song.album ?? "",
+      artworkUrl: uri,
     });
   } catch (e) {
-    console.log("⚠️ lockscreen error", e);
+    console.log(e);
   }
 };
 
@@ -128,9 +138,8 @@ export const useSongStore = create<ISongStore>((set, get) => ({
     }
 
     // Suscríbete al evento de progreso
-    const newSub = newPlayer.addListener("playbackStatusUpdate", (status) => {
-      // Este log solo aparecerá si la canción se carga correctamente
-      console.log("Listener disparado!", status);
+    const newSub = newPlayer.addListener("statusChange", (status) => {
+      console.log("STATUS:", status);
 
       set({
         currentTime: status.currentTime ?? 0,
@@ -188,10 +197,14 @@ export const useSongStore = create<ISongStore>((set, get) => ({
      ⏭ NEXT
   ========================= */
   handleNext: async () => {
-    const { queue, currentIndex } = get();
+    const { queue } = get();
     if (!queue.length) return;
 
-    const nextIndex = currentIndex + 1 < queue.length ? currentIndex + 1 : 0;
+    // Elegir un índice aleatorio distinto al actual
+    let nextIndex;
+    do {
+      nextIndex = Math.floor(Math.random() * queue.length);
+    } while (nextIndex === get().currentIndex && queue.length > 1);
 
     set({ currentIndex: nextIndex });
     await get().playCurrent();
@@ -201,11 +214,13 @@ export const useSongStore = create<ISongStore>((set, get) => ({
      ⏮ PREV
   ========================= */
   handlePrev: async () => {
-    const { queue, currentIndex } = get();
+    const { queue } = get();
     if (!queue.length) return;
 
-    const prevIndex =
-      currentIndex - 1 >= 0 ? currentIndex - 1 : queue.length - 1;
+    let prevIndex;
+    do {
+      prevIndex = Math.floor(Math.random() * queue.length);
+    } while (prevIndex === get().currentIndex && queue.length > 1);
 
     set({ currentIndex: prevIndex });
     await get().playCurrent();
