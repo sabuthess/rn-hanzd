@@ -12,8 +12,6 @@ export default function HomeScreen() {
       <View style={styles.root}>
         <SongsScreen />
         {currentSong?.title && <SongFooter />}
-        {/* <Auth /> */}
-        {/* <GlobalPlayer /> */}
       </View>
     </>
   );
