@@ -1,17 +1,16 @@
-import { useSongStore } from "@/zustand/store/useSongStore";
-import { useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Icon from "react-native-vector-icons/Ionicons";
 
 import { formatText } from "@/utils/format-song";
+import { storage } from "@/utils/mmkv";
+import { useSongStore } from "@/zustand/store/useSongStore";
+import { useLocalSearchParams } from "expo-router";
 import React, { useEffect } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
+import TrackPlayer from "react-native-track-player";
+import Icon from "react-native-vector-icons/Ionicons";
 
 export default function SongDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
-
-  const image = require("@/assets/images/child-background-img.jpg");
-
   const {
     queue,
     currentIndex,
@@ -21,11 +20,37 @@ export default function SongDetail() {
     isPlaying,
     togglePlay,
   } = useSongStore();
-
   const currentSong = queue[currentIndex];
+
+  console.log("current idx", currentIndex);
+  console.log("id song", id);
+
+  const image = require("@/assets/images/child-background-img.jpg");
 
   useEffect(() => {
     if (id) setSongById(id);
+  }, [id]);
+
+  useEffect(() => {
+    async function loadSong() {
+      const storedSongs = await storage.getString("@local_songs");
+      const parsedSongs: any = storedSongs ? JSON.parse(storedSongs) : [];
+
+      const currentSong = parsedSongs.findIndex((s) => s.id === id);
+
+      // await TrackPlayer.reset();
+
+      await TrackPlayer.add({
+        id: currentSong.id,
+        url: currentSong.uri,
+        title: currentSong.title,
+        artist: "Unknown artist",
+      });
+
+      await TrackPlayer.play();
+    }
+
+    loadSong();
   }, [id]);
 
   return (
@@ -108,8 +133,8 @@ const styles = StyleSheet.create({
   },
 
   btn_wrapper: {
-    width: 70, // ancho fijo
-    height: 70, // alto fijo
+    width: 70,
+    height: 70,
     justifyContent: "center",
     alignItems: "center",
   },
