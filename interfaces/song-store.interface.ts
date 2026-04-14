@@ -1,13 +1,10 @@
-import type { AudioPlayer } from "expo-audio";
-import { ISong } from "./song.interface";
-
 export interface ISongStore {
-  songs: ISong[];
+  songs: any[];
 
-  queue: ISong[];
+  queue: any[];
   currentIndex: number;
 
-  player: AudioPlayer | null;
+  player: any | null;
   subscription: any | null;
 
   trackingInterval: NodeJS.Timeout | null;
@@ -18,9 +15,9 @@ export interface ISongStore {
 
   isPlaying: boolean;
 
-  setSongs: (songs: ISong[]) => void;
+  setSongs: (songs: any[]) => void;
 
-  setQueue: (songs: ISong[], startIndex?: number) => Promise<void>;
+  setQueue: (songs: any[], startIndex?: number) => Promise<void>;
   playCurrent: () => Promise<void>;
   setSongById: (id: string) => Promise<void>;
 
@@ -29,7 +26,7 @@ export interface ISongStore {
   handleNext: () => Promise<void>;
   handlePrev: () => Promise<void>;
 
-  addToQueue: (song: ISong) => void;
+  addToQueue: (song: any) => any;
   removeFromQueue: (index: number) => void;
-  replaceQueue: (songs: ISong[]) => void;
+  replaceQueue: (songs: any[]) => void;
 }
