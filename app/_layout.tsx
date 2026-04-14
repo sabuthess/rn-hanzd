@@ -1,33 +1,36 @@
-import { GlobalPlayer } from "@/components/global-player";
-import { setAudioModeAsync } from "expo-audio";
 import { Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { Pressable, TouchableOpacity, View } from "react-native";
 import "react-native-reanimated";
+import TrackPlayer from "react-native-track-player";
 import Icon from "react-native-vector-icons/Ionicons";
 import ModalDrawer from "../components/modal-drawer";
+
+TrackPlayer.registerPlaybackService(() =>
+  require("../services/track-player.service"),
+);
+
+let isInitialized = false;
+
+export const initTrackPlayer = async () => {
+  if (isInitialized) return;
+
+  await TrackPlayer.setupPlayer();
+  isInitialized = true;
+};
 
 export default function RootLayout() {
   const router = useRouter();
   const [isMenuActive, setIsMenuActive] = useState<boolean>(false);
 
+  useEffect(() => {
+    initTrackPlayer();
+  }, []);
+
   const handleMenuActive = () => {
     setIsMenuActive(!isMenuActive);
   };
-  useEffect(() => {
-    const setupAudio = async () => {
-      await setAudioModeAsync({
-        // staysActiveInBackground: true,
-        shouldPlayInBackground: true,
-        interruptionMode: "mixWithOthers",
-
-        playsInSilentMode: true,
-      });
-    };
-
-    setupAudio();
-  }, []);
 
   return (
     <>
@@ -117,7 +120,6 @@ export default function RootLayout() {
       </Stack>
       <StatusBar style="auto" />
       {isMenuActive && <ModalDrawer handleMenuActive={handleMenuActive} />}
-      <GlobalPlayer />
     </>
   );
 }
