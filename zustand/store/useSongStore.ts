@@ -56,7 +56,6 @@ export const useSongStore = create<ISongStore>((set, get) => ({
 
     // await initTrackPlayer();
 
-    await TrackPlayer.stop();
     await TrackPlayer.reset();
 
     await TrackPlayer.add(
@@ -69,8 +68,11 @@ export const useSongStore = create<ISongStore>((set, get) => ({
       })),
     );
 
+    await TrackPlayer.skip(currentIndex);
+    await TrackPlayer.play();
+
     set({
-      isPlaying: false,
+      isPlaying: true,
       currentTime: 0,
       duration: 0,
     });
@@ -86,9 +88,6 @@ export const useSongStore = create<ISongStore>((set, get) => ({
     await get().setQueue(songs, index);
   },
 
-  /* =========================
-     ▶️ / ⏸ TOGGLE
-  ========================= */
   togglePlay: async () => {
     const { isPlaying } = get();
 
@@ -100,17 +99,29 @@ export const useSongStore = create<ISongStore>((set, get) => ({
       set({ isPlaying: true });
     }
   },
-  /* =========================
-     ⏭ NEXT
-  ========================= */
+
   handleNext: async () => {
-    await TrackPlayer.skipToNext();
+    const { currentIndex, queue } = get();
+
+    if (currentIndex < queue.length - 1) {
+      const newIndex = currentIndex + 1;
+
+      await TrackPlayer.skipToNext();
+
+      set({ currentIndex: newIndex });
+    }
   },
-  /* =========================
-     ⏮ PREV
-  ========================= */
+
   handlePrev: async () => {
-    await TrackPlayer.skipToPrevious();
+    const { currentIndex } = get();
+
+    if (currentIndex > 0) {
+      const newIndex = currentIndex - 1;
+
+      await TrackPlayer.skipToPrevious();
+
+      set({ currentIndex: newIndex });
+    }
   },
   /* =========================
      ➕ ADD TO QUEUE
