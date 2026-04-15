@@ -101,24 +101,34 @@ export const useSongStore = create<ISongStore>((set, get) => ({
   },
 
   handleNext: async () => {
-    const { currentIndex, queue } = get();
+    const { currentIndex, queue, isPlaying } = get();
 
     if (currentIndex < queue.length - 1) {
       const newIndex = currentIndex + 1;
 
       await TrackPlayer.skipToNext();
 
+      if (!isPlaying) {
+        set({ isPlaying: true });
+        await TrackPlayer.play();
+      }
+
       set({ currentIndex: newIndex });
     }
   },
 
   handlePrev: async () => {
-    const { currentIndex } = get();
+    const { currentIndex, isPlaying } = get();
 
     if (currentIndex > 0) {
       const newIndex = currentIndex - 1;
 
       await TrackPlayer.skipToPrevious();
+
+      if (!isPlaying) {
+        set({ isPlaying: true });
+        await TrackPlayer.play();
+      }
 
       set({ currentIndex: newIndex });
     }
