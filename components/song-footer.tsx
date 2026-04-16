@@ -26,25 +26,29 @@ export const SongFooter = () => {
           <Image source={image} style={styles.container_song_modal_img_info} />
 
           <View>
-            <Text numberOfLines={1} ellipsizeMode="tail" style={{ width: 150 }}>
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={{ width: 150, color: "#000" }}
+            >
               {formatText(currentSong?.title)}
             </Text>
-            <Text>Unknown Artist</Text>
+            <Text style={{ color: "#444" }}>Unknown Artist</Text>
           </View>
         </Pressable>
       </Link>
 
       <View style={styles.container_songs_modal_btns_controllers}>
         {isPlaying ? (
-          <Icon name="pause" size={30} onPress={togglePlay} />
+          <Icon name="pause" size={30} onPress={togglePlay} color="#000" />
         ) : (
-          <Icon name="play" size={30} onPress={togglePlay} />
+          <Icon name="play" size={30} onPress={togglePlay} color="#000" />
         )}
 
         <Icon
           name="play-skip-forward"
           size={30}
-          color="black"
+          color="#000"
           onPress={handleNext}
         />
       </View>
@@ -58,22 +62,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    // alignItems: "center",
     width: "90%",
     marginHorizontal: "auto",
-    // padding: 10,
     marginBottom: 20,
-    // borderRadius: 5,
-    // backgroundColor: "#8dc2ad",
-    backgroundColor: "#ecfff8",
+    backgroundColor: "#16a084af",
+    borderRadius: 50,
   },
 
   container_song_modal_info: {
     display: "flex",
     flexDirection: "row",
     gap: 10,
-    // backgroundColor: "blue",
-    // paddingHorizontal: 10,
     paddingVertical: 10,
   },
 
