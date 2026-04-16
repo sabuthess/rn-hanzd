@@ -3,7 +3,7 @@ import { useSongStore } from "@/zustand/store/useSongStore";
 import * as MediaLibrary from "expo-media-library";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Button, StatusBar, StyleSheet, Text } from "react-native";
+import { StatusBar, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 export default function ScanLocalSongsScreen() {
@@ -53,11 +53,14 @@ export default function ScanLocalSongsScreen() {
       <SafeAreaView style={styles.container}>
         <Text style={styles.item}>Escanear canciones</Text>
 
-        <Button
-          title={loading ? "Cargando..." : "Pedir permiso y cargar canciones"}
+        <TouchableOpacity
+          style={styles.button}
           onPress={requestPermissionAndLoadSongs}
-          disabled={loading}
-        />
+        >
+          <Text style={styles.text} disabled={loading}>
+            {loading ? "Cargando..." : "Escanear canciones"}
+          </Text>
+        </TouchableOpacity>
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -77,4 +80,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
   },
+
+  button: {
+    backgroundColor: "#16a085",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginVertical: 30,
+  },
+
+  text: { color: "#fff", fontWeight: "bold", textAlign: "center" },
 });
