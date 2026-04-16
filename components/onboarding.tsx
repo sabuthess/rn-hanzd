@@ -109,7 +109,7 @@ export function Onboarding({ onFinish }) {
             style={styles.button}
             onPress={requestPermissionAndLoadSongs}
           >
-            <Text style={styles.buttonText}>
+            <Text style={styles.buttonText} disabled={loadingPermissions}>
               {loadingPermissions ? "Cargando..." : "Escanear canciones"}
             </Text>
           </TouchableOpacity>
