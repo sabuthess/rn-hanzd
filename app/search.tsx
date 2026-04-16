@@ -57,16 +57,16 @@ export default function SearchScreen() {
 
 const styles = StyleSheet.create({
   container_header: {
-    flexDirection: "row", // Ya es flex por defecto
-    justifyContent: "center", // Centra los elementos horizontalmente
-    alignItems: "center", // Centra los elementos verticalmente
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     marginVertical: 20,
-    marginHorizontal: 30,
-    gap: 10, // No funciona en RN, usamos margenes individuales abajo
+    marginHorizontal: 40,
+    gap: 20,
   },
 
   header_item: {
-    marginHorizontal: 10, // Esto reemplaza el 'gap' entre elementos
+    marginHorizontal: 10,
   },
 
   container_input: {
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 15,
     borderRadius: 25,
-    backgroundColor: "#eee",
+    backgroundColor: "#eeeeeea4",
     width: "100%",
     alignSelf: "center",
   },
