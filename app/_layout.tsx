@@ -1,3 +1,4 @@
+import { checkIfOnboardingSeen, Onboarding } from "@/components/onboarding";
 import { Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
@@ -24,9 +25,28 @@ export default function RootLayout() {
   const router = useRouter();
   const [isMenuActive, setIsMenuActive] = useState<boolean>(false);
 
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     initTrackPlayer();
   }, []);
+
+  useEffect(() => {
+    init();
+  }, []);
+
+  const init = async () => {
+    const seen = await checkIfOnboardingSeen();
+    setShowOnboarding(!seen);
+    setLoading(false);
+  };
+
+  if (loading) return null;
+
+  if (showOnboarding) {
+    return <Onboarding onFinish={() => setShowOnboarding(false)} />;
+  }
 
   const handleMenuActive = () => {
     setIsMenuActive(!isMenuActive);
@@ -119,6 +139,8 @@ export default function RootLayout() {
         />
       </Stack>
       <StatusBar style="auto" />
+
+      {}
       {isMenuActive && <ModalDrawer handleMenuActive={handleMenuActive} />}
     </>
   );
