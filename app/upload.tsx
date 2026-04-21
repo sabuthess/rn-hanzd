@@ -1,65 +1,60 @@
-import { storage } from "@/utils/mmkv";
-import { useSongStore } from "@/zustand/store/useSongStore";
-import * as MediaLibrary from "expo-media-library";
-import { useRouter } from "expo-router";
+import { supabase } from "@/lib/supabase";
+import * as DocumentPicker from "expo-document-picker";
 import React, { useState } from "react";
 import { Button, StatusBar, StyleSheet, Text } from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function UploalLocalSongsScreen() {
-  const { setSongs } = useSongStore();
   const [loading, setLoading] = useState(false);
 
-  const router = useRouter();
+  const handleOnPress = async () => {
+    const result = await DocumentPicker.getDocumentAsync({
+      type: "audio/*",
+      copyToCacheDirectory: true,
+      multiple: true,
+    });
 
-  const requestPermissionAndLoadSongs = async () => {
-    setLoading(true);
-    try {
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-      if (status !== "granted") {
-        alert("Permiso denegado para acceder a la música");
-        setLoading(false);
-        return;
+    if (result.canceled) return;
+
+    for (const song of result.assets) {
+      try {
+        // Todod esto esta bien
+
+        const file = {
+          uri: song.uri,
+          name: song.name,
+          type: song.mimeType || "audio/mpeg",
+        };
+
+        const filePath = `songs/${Date.now()}-${song.name}`;
+
+        const { error } = await supabase.storage
+          .from("files")
+          .upload(filePath, file, {
+            contentType: file.type,
+          });
+
+        if (!error) {
+          console.log("Subido:", filePath);
+        } else {
+          throw error;
+        }
+      } catch (err) {
+        console.error("Error subiendo:", song.name, err);
+      } finally {
+        setLoading(true);
       }
-
-      const media = await MediaLibrary.getAssetsAsync({
-        mediaType: "audio",
-        first: 1000,
-        sortBy: "creationTime",
-      });
-
-      const songs = media.assets.map(({ id, filename, uri }) => ({
-        id,
-        title: filename,
-        uri,
-      }));
-
-      await storage.set("@local_songs", JSON.stringify(songs));
-      setSongs(songs);
-      // await AsyncStorage.setItem("@local_songs", );
-
-      setLoading(false);
-      router.back();
-
-      // Navegar a la pantalla /songs
-    } catch (error) {
-      console.warn("Error cargando canciones", error);
-      setLoading(false);
     }
   };
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.item}>Upload songs</Text>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.item}>
+        Seleciona las canciones que quieres subir a la Nube
+      </Text>
 
-        <Button
-          title={loading ? "Cargando..." : "Pedir permiso y cargar canciones"}
-          onPress={requestPermissionAndLoadSongs}
-          disabled={loading}
-        />
-      </SafeAreaView>
-    </SafeAreaProvider>
+      <Button title="Subir canciones" onPress={handleOnPress} />
+    </SafeAreaView>
   );
 }
 
